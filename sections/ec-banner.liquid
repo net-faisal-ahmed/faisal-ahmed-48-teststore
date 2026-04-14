@@ -2,7 +2,7 @@
 
     <div class="ec-banner__content-mobile">
         <h2>{{ section.settings.heading_text }}</h2>
-        <p>{{ section.settings.content_text }}</p>
+        <p>{{ section.settings.content_text_mobile }}</p>
     </div>
 
     {% if section.settings.banner_image != blank %}
@@ -56,6 +56,12 @@
       "id": "content_text",
       "label": "Content Text",
       "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+    },
+    {
+      "type": "textarea",
+      "id": "content_text_mobile",
+      "label": "Content for mobile",
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination."
     },
     {
       "type": "text",

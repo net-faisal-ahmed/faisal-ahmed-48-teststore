@@ -45,15 +45,15 @@
           "type": "product",
           "settings": {
             "product": "classic-leather-jacket",
-            "position_top": 50,
-            "position_left": 50
+            "position_top": 39,
+            "position_left": 62
           }
         },
         "product_Wmiexk": {
           "type": "product",
           "settings": {
             "product": "chequered-red-shirt",
-            "position_top": 50,
+            "position_top": 27,
             "position_left": 50
           }
         },
@@ -61,16 +61,16 @@
           "type": "product",
           "settings": {
             "product": "black-leather-bag",
-            "position_top": 50,
-            "position_left": 50
+            "position_top": 63,
+            "position_left": 40
           }
         },
         "product_m633wF": {
           "type": "product",
           "settings": {
             "product": "blue-silk-tuxedo",
-            "position_top": 50,
-            "position_left": 50
+            "position_top": 77,
+            "position_left": 57
           }
         }
       },
