@@ -24,18 +24,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function openProductPopup(handle, currency) {
   fetch(`/products/${handle}.js`)
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error('Could not load product');
-      }
-      return response.json();
-    })
-    .then(function (product) {
-      renderProductPopup(product, currency);
-    })
-    .catch(function (error) {
-      console.error(error);
-    });
+    .then(res => res.json())
+    .then(product => renderProductPopup(product, currency));
 }
 
 function renderProductPopup(product, currency) {
@@ -49,156 +39,207 @@ function renderProductPopup(product, currency) {
   document.body.appendChild(overlay);
   document.documentElement.style.overflow = 'hidden';
 
-  setTimeout(function () {
-    overlay.classList.add('open');
-  }, 10);
+  // Close
+  overlay.querySelector('.ec-product-popup__close')
+    .addEventListener('click', () => closeProductPopup(overlay));
 
-  overlay.addEventListener('click', function (event) {
-    if (event.target === overlay) {
-      closeProductPopup(overlay);
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeProductPopup(overlay);
+  });
+
+  // Auto select color
+  overlay.querySelectorAll('.ec-color-options').forEach(group => {
+    const first = group.querySelector('.ec-color-btn');
+    if (first) first.classList.add('active');
+  });
+
+  // Auto select size
+  overlay.querySelectorAll('.ec-custom-select').forEach(select => {
+    const first = select.querySelector('.ec-select-option');
+    if (first) {
+      first.classList.add('active');
+      select.querySelector('.ec-select-trigger span').textContent = first.dataset.value;
     }
   });
 
-  overlay.querySelector('.ec-product-popup__close').addEventListener('click', function () {
-    closeProductPopup(overlay);
-  });
-
-  const optionInputs = overlay.querySelectorAll('.ec-product-popup__option select');
-  optionInputs.forEach(function (select) {
-    select.addEventListener('change', function () {
+  // COLOR click
+  overlay.querySelectorAll('.ec-color-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const wrap = btn.closest('.ec-color-options');
+      wrap.querySelectorAll('.ec-color-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       updatePopupVariant(product, overlay);
     });
   });
 
-  updatePopupVariant(product, overlay);
+  // CUSTOM SELECT
+  overlay.querySelectorAll('.ec-custom-select').forEach(select => {
+    const trigger = select.querySelector('.ec-select-trigger');
+    const dropdown = select.querySelector('.ec-select-dropdown');
+    const label = trigger.querySelector('span');
 
-  const addToCartButton = overlay.querySelector('.ec-product-popup__button');
-  addToCartButton.addEventListener('click', function () {
-    addToCart(product, overlay);
+    trigger.addEventListener('click', () => {
+      select.classList.toggle('open');
+    });
+
+    select.querySelectorAll('.ec-select-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const value = option.dataset.value;
+
+        label.textContent = value;
+
+        select.querySelectorAll('.ec-select-option')
+          .forEach(o => o.classList.remove('active'));
+
+        option.classList.add('active');
+        select.classList.remove('open');
+
+        updatePopupVariant(product, overlay);
+      });
+    });
   });
-}
 
-function closeExistingPopup() {
-  const existing = document.querySelector('.ec-product-popup-overlay');
-  if (existing) {
-    existing.remove();
-    document.documentElement.style.overflow = '';
-  }
-}
+  // Close dropdown outside
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.ec-custom-select')) {
+      document.querySelectorAll('.ec-custom-select')
+        .forEach(el => el.classList.remove('open'));
+    }
+  });
 
-function closeProductPopup(overlay) {
-  if (!overlay) return;
-  overlay.classList.remove('open');
-  document.documentElement.style.overflow = '';
-  setTimeout(function () {
-    overlay.remove();
-  }, 150);
+  // ADD TO CART
+  overlay.querySelector('.ec-add-btn')
+    .addEventListener('click', () => addToCart(overlay));
+
+  updatePopupVariant(product, overlay);
 }
 
 function buildPopupMarkup(product, currency) {
-  const imageUrl = product.images && product.images.length > 0
-    ? `${product.images[0]}?crop=center&height=800&width=800&resize=800x800`
-    : '';
+  const imageUrl = product.images?.[0] || '';
 
-  const optionSelectors = product.options.map(function (option, optionIndex) {
-    const values = getOptionValues(product, optionIndex);
-    const optionsHtml = values.map(function (value) {
-      return `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`;
-    }).join('');
+  const optionSelectors = product.options.map((option, index) => {
+    const optionName = option.name;
+    const values = option.values;
+
+    if (optionName.toLowerCase() === 'color') {
+      return `
+        <div class="ec-product-popup__option ${optionName.toLowerCase()}">
+          <div class="ec-label">${optionName}</div>
+          <div class="ec-color-options" data-option-index="${index}">
+            ${values.map(v => `
+              <button type="button" class="ec-color-btn" data-value="${v}">
+                <span>${v}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
 
     return `
-      <div class="ec-product-popup__option">
-        <label for="product-option-${optionIndex}">${escapeHtml(option)}</label>
-        <select id="product-option-${optionIndex}" data-option-index="${optionIndex}">
-          ${optionsHtml}
-        </select>
-      </div>`;
+      <div class="ec-product-popup__option ${optionName.toLowerCase()}">
+        <div class="ec-label">${optionName}</div>
+
+        <div class="ec-custom-select" data-option-index="${index}">
+          <div class="ec-select-trigger">
+            <span>Select your ${optionName}</span>
+            <span class="ec-arrow">▾</span>
+          </div>
+
+          <div class="ec-select-dropdown">
+            ${values.map(v => `
+              <div class="ec-select-option" data-value="${v}">
+                ${v}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
   }).join('');
 
   return `
     <div class="ec-product-popup">
-      <button type="button" class="ec-product-popup__close" aria-label="Close popup">×</button>
-      <div class="ec-product-popup__content">
+      <button class="ec-product-popup__close">×</button>
 
-        <div class="ec-product-popup__top">
-            <div class="ec-product-popup__image">
-                ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(product.title)}" />` : ''}
-            </div>
-            <div>
-                <h2 class="ec-product-popup__title">${escapeHtml(product.title)}</h2>
-                <div class="ec-product-popup__price">${formatMoney(product.price, currency)}</div>
-                <div class="ec-product-popup__description">${escapeHtml(product.description || '')}</div>
-            </div>
-        </div>  
-
-        <div class="ec-product-popup__details">
-          ${optionSelectors}
-          <div class="ec-product-popup__actions">
-            <button type="button" class="ec-product-popup__button">Add to cart</button>
-            <div class="ec-product-popup__status" aria-live="polite"></div>
-          </div>
+      <div class="ec-popup-grid">
+        <div class="ec-popup-image">
+            ${imageUrl ? `<img src="${imageUrl}" />` : ''}
+        </div>
+        <div class="ec-popup-details">
+            <h2>${product.title}</h2>
+            <div class="ec-price">${formatMoney(product.price, currency)}</div>
+            <p class="ec-desc">${product.description || ''}</p>
         </div>
       </div>
-    </div>`;
+      <div class="ec-popup-info">
+          <div class="ec-popup-info__options">
+            ${optionSelectors}
+          </div>
+          <button class="ec-add-btn" disabled>
+                <span>ADD TO CART</span> 
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M22.354 11.646a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l3.147-3.146H2a.5.5 0 0 1 0-1h18.793l-3.147-3.146a.5.5 0 0 1 .708-.708z" opacity="1" data-original="#000000" class=""></path></g></svg>
+          </button>
+          <div class="ec-product-popup__status"></div>
+        </div>
+    </div>
+    
+  `;
 }
 
 function updatePopupVariant(product, overlay) {
-  const selects = overlay.querySelectorAll('.ec-product-popup__option select');
-  const selectedOptions = Array.from(selects).map(function (select) {
-    return select.value;
+  const selectedOptions = [];
+
+  product.options.forEach((option, index) => {
+    const name = option.name.toLowerCase();
+
+    if (name === 'color') {
+      const group = overlay.querySelector(`.ec-color-options[data-option-index="${index}"]`);
+      const active = group?.querySelector('.active');
+      selectedOptions[index] = active ? active.dataset.value : '';
+    } else {
+      const select = overlay.querySelector(`.ec-custom-select[data-option-index="${index}"]`);
+      const active = select?.querySelector('.ec-select-option.active');
+      selectedOptions[index] = active ? active.dataset.value : '';
+    }
   });
 
-  const variant = findMatchingVariant(product, selectedOptions);
-  const priceElement = overlay.querySelector('.ec-product-popup__price');
-  const status = overlay.querySelector('.ec-product-popup__status');
-  const button = overlay.querySelector('.ec-product-popup__button');
+  const variant = product.variants.find(v =>
+    selectedOptions.every((opt, i) => v.options[i] === opt)
+  );
 
-  const currency = overlay.dataset.currency || 'USD';
+  const priceEl = overlay.querySelector('.ec-price');
+  const btn = overlay.querySelector('.ec-add-btn');
+  const status = overlay.querySelector('.ec-product-popup__status');
 
   if (variant) {
-    priceElement.textContent = formatMoney(variant.price, currency);
-    button.disabled = false;
-    button.dataset.variantId = variant.id;
-    status.textContent = variant.available ? '' : 'Sold out';
-    if (!variant.available) {
-      button.textContent = 'Sold out';
-      button.style.opacity = '0.6';
-      button.style.cursor = 'not-allowed';
-    } else {
-      button.textContent = 'Add to cart';
-      button.style.opacity = '1';
-      button.style.cursor = 'pointer';
-    }
+    priceEl.textContent = formatMoney(variant.price, overlay.dataset.currency);
+    btn.dataset.variantId = variant.id;
+    btn.disabled = !variant.available;
+
+    btn.innerHTML = variant.available 
+  ? `<span>ADD TO CART </span>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M22.354 11.646a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l3.147-3.146H2a.5.5 0 0 1 0-1h18.793l-3.147-3.146a.5.5 0 0 1 .708-.708z"/>
+    </svg>`
+  : 'Sold Out';
+    status.textContent = '';
   } else {
-    priceElement.textContent = formatMoney(product.price, currency);
-    button.disabled = true;
-    button.dataset.variantId = '';
-    status.textContent = 'Please choose an option.';
-    button.style.opacity = '0.6';
-    button.style.cursor = 'not-allowed';
+    btn.disabled = true;
+    btn.dataset.variantId = '';
+    status.textContent = 'Please select options';
   }
 }
 
-function findMatchingVariant(product, selectedOptions) {
-  return product.variants.find(function (variant) {
-    return selectedOptions.every(function (option, index) {
-      return variant.options[index] === option;
-    });
-  });
-}
-
-function addToCart(product, overlay) {
-  const button = overlay.querySelector('.ec-product-popup__button');
+function addToCart(overlay) {
+  const btn = overlay.querySelector('.ec-add-btn');
   const status = overlay.querySelector('.ec-product-popup__status');
-  const variantId = button.dataset.variantId;
+  const variantId = btn.dataset.variantId;
 
-  if (!variantId) {
-    status.textContent = 'Please select a variant before adding to cart.';
-    return;
-  }
+  if (!variantId) return;
 
-  button.disabled = true;
-  button.textContent = 'Adding…';
+  btn.disabled = true;
+  btn.innerHTML = '<span>Adding...</span>';
 
   fetch('/cart/add.js', {
     method: 'POST',
@@ -206,56 +247,83 @@ function addToCart(product, overlay) {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     },
-    body: JSON.stringify({ id: variantId, quantity: 1 })
-  })
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error('Could not add to cart');
-      }
-      return response.json();
+    body: JSON.stringify({
+      id: variantId,
+      quantity: 1
     })
-    .then(function () {
-      button.textContent = 'Added ✓';
-      status.textContent = 'Product added to cart.';
-      setTimeout(function () {
-        closeProductPopup(overlay);
+  })
+    .then(res => res.json())
+    .then(() => {
+      btn.innerHTML = '<span>Added ✓</span>';
+      status.innerHTML = '<span>Added to cart</span>';
+
+      document.dispatchEvent(new CustomEvent('cart:refresh'));
+
+      setTimeout(() => {
+        window.location.href = '/cart';
       }, 800);
     })
-    .catch(function () {
-      button.disabled = false;
-      button.textContent = 'Add to cart';
-      status.textContent = 'Unable to add to cart. Please try again.';
+    .catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = '<span>ADD TO CART →</span>';
     });
 }
 
-function getOptionValues(product, optionIndex) {
-  var values = product.variants.reduce(function (acc, variant) {
-    var optionValue = variant[`option${optionIndex + 1}`] || '';
-    if (optionValue && acc.indexOf(optionValue) === -1) {
-      acc.push(optionValue);
-    }
-    return acc;
-  }, []);
-  return values;
+function closeExistingPopup() {
+  document.querySelector('.ec-product-popup-overlay')?.remove();
+}
+
+function closeProductPopup(overlay) {
+  overlay.remove();
+  document.documentElement.style.overflow = '';
 }
 
 function formatMoney(cents, currency) {
-  var amount = cents / 100;
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: currency
-    }).format(amount);
-  } catch (error) {
-    return amount.toFixed(2) + ' ' + currency;
-  }
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency
+  }).format(cents / 100);
 }
 
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const menuBtn = document.querySelector('.ec-header__mobile-menu');
+  const mobileMenu = document.querySelector('.ec-mobile-menu');
+  const body = document.body;
+
+  if (!menuBtn || !mobileMenu) return;
+
+  // TOGGLE MENU
+  menuBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+
+    menuBtn.classList.toggle('is-active');
+    mobileMenu.classList.toggle('is-open');
+    body.classList.toggle('menu-open');
+  });
+
+  // CLOSE ON OUTSIDE CLICK
+  document.addEventListener('click', function (e) {
+    if (
+      !e.target.closest('.ec-mobile-menu') &&
+      !e.target.closest('.ec-header__mobile-menu')
+    ) {
+      closeMenu();
+    }
+  });
+
+  // CLOSE ON ESC
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      closeMenu();
+    }
+  });
+
+  function closeMenu() {
+    menuBtn.classList.remove('is-active');
+    mobileMenu.classList.remove('is-open');
+    body.classList.remove('menu-open');
+  }
+});

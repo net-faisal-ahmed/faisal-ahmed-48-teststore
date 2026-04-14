@@ -4,6 +4,13 @@
    
       <div class="ec-header-wrap">
 
+          <div class="ec-header__mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+
            <!-- Left -->
           <div class="ec-header__logo">
               <a href="/">
@@ -17,7 +24,9 @@
 
           <!-- Center -->
           <div class="ec-header__announcement-bar">
-            Find the ideal gift for your loved ones.
+            {% if section.settings.announcement_text != blank %}
+              <span>{{ section.settings.announcement_text }}</span>
+            {% endif %}
           </div>
 
           <!-- Right -->
@@ -28,11 +37,25 @@
             </a>
           </div>
 
+          <div class="ec-header__right-empty">&nbsp;</div>
+
       </div>
 
     </div>
 
+    <div class="ec-mobile-menu">
+      {% if section.settings.announcement_text != blank %}
+        <p>{{ section.settings.announcement_text }}</p>
+      {% endif %}
+      <a href="#" class="ec-button ec-button--primary">
+        <span>CHOOSE GIFT</span>
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M22.354 11.646a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l3.147-3.146H2a.5.5 0 0 1 0-1h18.793l-3.147-3.146a.5.5 0 0 1 .708-.708z" opacity="1" data-original="#000000" class=""></path></g></svg>
+      </a>
+    </div>
+
 </header>
+
+
 
 {% schema %}
 {

@@ -1,4 +1,10 @@
 <section class="ec-banner">
+
+    <div class="ec-banner__content-mobile">
+        <h2>{{ section.settings.heading_text }}</h2>
+        <p>{{ section.settings.content_text }}</p>
+    </div>
+
     {% if section.settings.banner_image != blank %}
         <div class="ec-banner__image">
             <img src="{{ section.settings.banner_image | img_url: '2048x' }}" alt="{{ section.settings.banner_image_alt | default: section.settings.heading_text | escape }}">
