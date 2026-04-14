@@ -1,0 +1,152 @@
+/*Base Styles*/
+
+.ec-container{
+    padding: 0 100px;
+}
+
+/*Button Styles*/
+.ec-button{
+    position: relative;
+    overflow: hidden;
+    padding: 10px 30px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+.ec-button svg{
+    width: 22px;
+    height: 22px;
+    fill: #000;
+    transition: fill 0.3s ease;
+}
+.ec-button--primary{
+    background-color: #FFF544;
+    color: #000;
+}
+.ec-button--primary:hover{
+    color: #FFF;
+}
+.ec-button--primary:hover svg{
+    fill: #FFF !important;
+    z-index: 1;
+}
+.ec-button--secondary:hover svg{
+    fill: #FFF !important;
+    z-index: 1;
+}
+.ec-button--primary::before{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 100%;
+    background-color: #000;
+    transition: width 0.35s ease;
+    z-index: 0;
+}
+.ec-button--secondary{
+    background-color: #000;
+    color: #fff;
+}
+.ec-button--secondary svg{
+    fill: #fff !important;
+}
+.ec-button--secondary::before{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 100%;
+    background-color: #FFF544;
+    transition: width 0.35s ease;
+    z-index: 0;
+}
+.ec-button--secondary:hover{
+    color: #000;
+}
+.ec-button--secondary:hover svg{
+    fill: #000 !important;
+}
+.ec-button:hover::before{
+    width: 100%;
+}
+
+.ec-button span{
+    position: relative;
+    z-index: 1;
+}
+
+
+/*Header Styles*/
+.shopify-section.shopify-section-group-header-group{
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.ec-header-section{
+    background-color: #F5F5F5;
+    padding: 10px 0;
+}
+.ec-header__logo a{
+    display: flex;
+    align-items: center;
+}
+.ec-header__logo img{
+    height: 20px;
+    width: auto;
+}
+.ec-header-wrap{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+/*Banner Styles*/
+.ec-banner{
+    position: relative;
+}
+.ec-banner__image{
+    position: relative;
+    overflow: hidden;
+}
+.ec-banner__image img{
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+.ec-banner__content{
+    position: absolute;
+    bottom: 120px;
+    color: #000;
+    text-align: left;
+    padding: 20px 100px;
+    width: 40%;
+    left: 0;
+}
+.ec-banner__content h2{
+    font-size: 70px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+.ec-banner__content p{
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #000;
+}
+.ec-banner__footer{
+    background-color: #F5F5F5;
+    text-align: center;
+    padding: 15px 20px;
+    font-size: 16px;
+    color: #000;
+}

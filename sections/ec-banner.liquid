@@ -1,0 +1,78 @@
+<section class="ec-banner">
+    {% if section.settings.banner_image != blank %}
+        <div class="ec-banner__image">
+            <img src="{{ section.settings.banner_image | img_url: '2048x' }}" alt="{{ section.settings.banner_image_alt | default: section.settings.heading_text | escape }}">
+        </div>
+    {% endif %}
+    <div class="ec-banner__content">
+        <h2>{{ section.settings.heading_text }}</h2>
+        <p>{{ section.settings.content_text }}</p>
+        {% if section.settings.button_link != blank %}
+            <a href="{{ section.settings.button_link }}" class="ec-button ec-button--secondary">
+                <span>{{ section.settings.button_text }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M22.354 11.646a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l3.147-3.146H2a.5.5 0 0 1 0-1h18.793l-3.147-3.146a.5.5 0 0 1 .708-.708z" opacity="1" data-original="#000000" class=""></path></g></svg>
+            </a>
+        {% else %}
+            <span class="ec-button ec-button--secondary">
+                <span>{{ section.settings.button_text }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M22.354 11.646a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708l3.147-3.146H2a.5.5 0 0 1 0-1h18.793l-3.147-3.146a.5.5 0 0 1 .708-.708z" opacity="1" data-original="#000000" class=""></path></g></svg>
+            </span>
+        {% endif %}
+    </div>
+    <div class="ec-banner__footer">
+        {{ section.settings.bottom_text }}
+    </div>
+</section>
+
+{% schema %}
+{
+  "name": "EC Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Image"
+    },
+    {
+      "type": "text",
+      "id": "banner_image_alt",
+      "label": "Banner Image Alt Text",
+      "default": "Banner image"
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Heading",
+      "default": "The Gift Guide"
+    },
+    {
+      "type": "textarea",
+      "id": "content_text",
+      "label": "Content Text",
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "text",
+      "id": "bottom_text",
+      "label": "Bottom Text",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "EC Banner"
+    }
+  ]
+}
+{% endschema %}
