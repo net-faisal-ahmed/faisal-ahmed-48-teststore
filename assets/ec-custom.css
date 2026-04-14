@@ -1,5 +1,5 @@
 /*Base Styles*/
-
+@import url('https://fonts.googleapis.com/css2?family=Lustria&display=swap');
 .ec-container{
     padding: 0 100px;
 }
@@ -149,4 +149,85 @@
     padding: 15px 20px;
     font-size: 16px;
     color: #000;
+}
+
+/* Product Grid Styles */
+
+.ec-product-grid__heading{
+    font-size: 36px;
+      font-family: "Lustria", serif;
+}
+.ec-product-grid__list{
+    display: grid;
+    gap: 30px;
+    grid-template-columns: repeat(3, 1fr);
+}
+.ec-product-grid__item{
+    position: relative;
+}
+.ec-product-grid__image{
+    position: relative;
+    min-height: 620px;
+}
+.ec-product-grid__image img{
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    object-position: top;
+}
+.ec-product-grid__quick-add{
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background-color: #fff;
+    color: #000;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/*Popup*/
+.ec-product-popup-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.ec-product-popup__content{
+    padding: 20px;
+}
+.ec-product-popup-overlay.open{
+    opacity: 1;
+    pointer-events: auto;
+}
+.ec-product-popup{
+    width: 460px;
+    overflow: auto;
+    background: #fff;
+    position: relative;
+}
+.ec-product-popup__top{
+    display: grid;
+    gap: 25px;
+    grid-template-columns: 1fr 1fr;
+}
+.ec-product-popup__image img{
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
 }

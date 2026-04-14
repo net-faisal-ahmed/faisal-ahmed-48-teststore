@@ -1,0 +1,101 @@
+﻿<section class="ec-product-grid" data-shop-currency="{{ shop.currency }}">
+
+  <div class="ec-container">
+
+    {% if section.settings.heading_text != blank %}
+      <h2 class="ec-product-grid__heading">{{ section.settings.heading_text }}</h2>
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+      <div class="ec-product-grid__list">
+        {% for block in section.blocks %}
+          {% if block.settings.product != blank %}
+            {% assign product = all_products[block.settings.product] %}
+            {% if product != nil %}
+              
+              <article class="ec-product-grid__item" data-product-handle="{{ product.handle }}">
+
+                {% if product.featured_image %}
+                  <div class="ec-product-grid__image">
+                    <img 
+                      src="{{ product.featured_image | img_url: '800x' }}" 
+                      alt="{{ product.title | escape }}" 
+                      class="ec-product-grid__image"
+                    />
+                  </div>
+                {% endif %}
+
+                <button 
+                  type="button" 
+                  class="ec-product-grid__quick-add" 
+                  data-action="quick-add"
+                  style="
+                    top: {{ block.settings.position_top }}%;
+                    left: {{ block.settings.position_left }}%;
+                    transform: translate(-50%, -50%);
+                  "
+                >
+                  +
+                </button>
+
+              </article>
+
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "EC Product Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Heading",
+      "default": "Tisso vison in the wild"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select product"
+        },
+        {
+          "type": "range",
+          "id": "position_top",
+          "label": "Button Vertical Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "position_left",
+          "label": "Button Horizontal Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "EC Product Grid"
+    }
+  ]
+}
+{% endschema %}
